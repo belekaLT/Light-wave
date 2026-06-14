@@ -63,11 +63,16 @@
                         <input type="checkbox" id="infoToggle" checked>
                         Show Info
                     </label>
+                    <label>
+                        <input type="checkbox" id="questToggle" checked>
+                        Show Quest
+                    </label>
                 </div>
             </div>
 
             <div class="canvas-container">
                 <canvas id="waveCanvas"></canvas>
+                
                 <div id="infoBox" class="info-box">
                     <div class="info-item">
                         <span class="label">Frequency:</span>
@@ -92,6 +97,26 @@
                     <div class="info-item">
                         <span class="label">Refraction Factor:</span>
                         <span class="value" id="infoRefraction">1.0</span>
+                    </div>
+                </div>
+
+                <div id="questBox" class="quest-box">
+                    <div class="quest-header">
+                        <h3>⭐ Quest</h3>
+                        <button id="nextQuestBtn" class="quest-btn">Next</button>
+                    </div>
+                    <div class="quest-content">
+                        <p id="questDescription">Match the target wave!</p>
+                        <div class="quest-target-wave">
+                            <canvas id="targetWaveCanvas"></canvas>
+                        </div>
+                        <div class="quest-accuracy">
+                            <div class="accuracy-label">Match Accuracy:</div>
+                            <div class="accuracy-bar">
+                                <div id="accuracyFill" class="accuracy-fill" style="width: 0%"></div>
+                            </div>
+                            <div id="accuracyPercent" class="accuracy-percent">0%</div>
+                        </div>
                     </div>
                 </div>
             </div>
