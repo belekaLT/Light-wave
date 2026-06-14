@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Wave Simulator - Light Wave Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌊 Wave Simulator - Light Wave Explorer</h1>
+            <p>An interactive simulation of waves with customizable properties and materials</p>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <h2>Wave Properties</h2>
+                
+                <div class="control-group">
+                    <label for="frequency">Frequency (Hz): <span id="freqValue">50</span></label>
+                    <input type="range" id="frequency" min="1" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label for="amplitude">Amplitude (Strength): <span id="ampValue">50</span></label>
+                    <input type="range" id="amplitude" min="1" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label for="speed">Speed (px/s): <span id="speedValue">50</span></label>
+                    <input type="range" id="speed" min="1" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label for="wavelength">Wavelength (px): <span id="wavelengthValue">100</span></label>
+                    <input type="range" id="wavelength" min="20" max="200" value="100">
+                </div>
+
+                <h2>Material Selection</h2>
+                <div class="material-buttons">
+                    <button class="material-btn active" data-material="vacuum" data-index="1.0">Vacuum (1.0)</button>
+                    <button class="material-btn" data-material="air" data-index="1.0003">Air (1.0003)</button>
+                    <button class="material-btn" data-material="water" data-index="1.33">Water (1.33)</button>
+                    <button class="material-btn" data-material="glass" data-index="1.5">Glass (1.5)</button>
+                    <button class="material-btn" data-material="diamond" data-index="2.42">Diamond (2.42)</button>
+                    <button class="material-btn" data-material="metal" data-index="0.5">Metal (0.5)</button>
+                </div>
+
+                <h2>Controls</h2>
+                <div class="button-group">
+                    <button id="startBtn" class="btn btn-primary">Start Simulation</button>
+                    <button id="pauseBtn" class="btn btn-secondary">Pause</button>
+                    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+                </div>
+
+                <div class="toggle-group">
+                    <label>
+                        <input type="checkbox" id="gridToggle" checked>
+                        Show Grid
+                    </label>
+                    <label>
+                        <input type="checkbox" id="infoToggle" checked>
+                        Show Info
+                    </label>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="waveCanvas"></canvas>
+                <div id="infoBox" class="info-box">
+                    <div class="info-item">
+                        <span class="label">Frequency:</span>
+                        <span class="value" id="infoFreq">50 Hz</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Wavelength:</span>
+                        <span class="value" id="infoWavelength">100 px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Material:</span>
+                        <span class="value" id="infoMaterial">Vacuum</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Period:</span>
+                        <span class="value" id="infoPeriod">0.02 s</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Actual Speed:</span>
+                        <span class="value" id="infoActualSpeed">50 px/s</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Refraction Factor:</span>
+                        <span class="value" id="infoRefraction">1.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created with ❤️ for physics enthusiasts | Learn wave propagation, refraction, and physics!</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
