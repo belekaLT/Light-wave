@@ -17,7 +17,8 @@ class WaveSimulator {
         };
         this.settings = {
             showGrid: true,
-            showInfo: true
+            showInfo: true,
+            showQuest: true
         };
         this.setupCanvas();
         this.createParticles();
@@ -37,7 +38,7 @@ class WaveSimulator {
 
     createParticles() {
         this.particles = [];
-        const spacing = 30;
+        const spacing = 10; // Smaller spacing for smoother curves
         const centerY = this.canvas.height / 2;
         
         for (let x = 0; x < this.canvas.width; x += spacing) {
@@ -127,6 +128,8 @@ class WaveSimulator {
     drawWaveLine() {
         this.ctx.strokeStyle = '#667eea';
         this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
         this.ctx.beginPath();
         
         for (let i = 0; i < this.particles.length; i++) {
@@ -142,8 +145,8 @@ class WaveSimulator {
     }
 
     drawParticles() {
-        this.ctx.fillStyle = '#764ba2';
-        const radius = 4;
+        this.ctx.fillStyle = 'rgba(118, 75, 162, 0.3)';
+        const radius = 3;
         
         for (let particle of this.particles) {
             this.ctx.beginPath();
@@ -241,21 +244,187 @@ class WaveSimulator {
         this.settings.showInfo = !this.settings.showInfo;
         document.getElementById('infoBox').style.display = this.settings.showInfo ? 'block' : 'none';
     }
+
+    toggleQuest() {
+        this.settings.showQuest = !this.settings.showQuest;
+        document.getElementById('questBox').style.display = this.settings.showQuest ? 'block' : 'none';
+    }
+
+    getWavePointsArray() {
+        return this.particles.map(p => ({x: p.x, y: p.y}));
+    }
+}
+
+// Quest System
+class QuestSystem {
+    constructor(simulator) {
+        this.simulator = simulator;
+        this.quests = [
+            {
+                name: 'Calm Ripple',
+                description: 'Create gentle waves with low frequency and amplitude',
+                targetFrequency: 20,
+                targetAmplitude: 30,
+                targetWavelength: 80,
+                color: 'rgba(102, 126, 234, 0.4)'
+            },
+            {
+                name: 'Ocean Wave',
+                description: 'Create powerful ocean-like waves',
+                targetFrequency: 40,
+                targetAmplitude: 70,
+                targetWavelength: 120,
+                color: 'rgba(52, 152, 219, 0.4)'
+            },
+            {
+                name: 'High Frequency',
+                description: 'Create rapid vibrations with high frequency',
+                targetFrequency: 85,
+                targetAmplitude: 45,
+                targetWavelength: 50,
+                color: 'rgba(155, 89, 182, 0.4)'
+            },
+            {
+                name: 'Smooth Flow',
+                description: 'Create a long, smooth wave pattern',
+                targetFrequency: 30,
+                targetAmplitude: 50,
+                targetWavelength: 150,
+                color: 'rgba(46, 204, 113, 0.4)'
+            },
+            {
+                name: 'Micro Waves',
+                description: 'Create very short, rapid waves',
+                targetFrequency: 70,
+                targetAmplitude: 25,
+                targetWavelength: 40,
+                color: 'rgba(230, 126, 34, 0.4)'
+            },
+            {
+                name: 'Perfect Sine',
+                description: 'Create a perfect medium wave',
+                targetFrequency: 50,
+                targetAmplitude: 50,
+                targetWavelength: 100,
+                color: 'rgba(241, 196, 15, 0.4)'
+            }
+        ];
+        
+        this.currentQuestIndex = 0;
+        this.targetWaveCanvas = document.getElementById('targetWaveCanvas');
+        this.targetWaveCtx = this.targetWaveCanvas.getContext('2d');
+        this.setupTargetCanvas();
+        this.drawTargetWave();
+    }
+
+    setupTargetCanvas() {
+        this.targetWaveCanvas.width = 220;
+        this.targetWaveCanvas.height = 80;
+    }
+
+    getCurrentQuest() {
+        return this.quests[this.currentQuestIndex];
+    }
+
+    nextQuest() {
+        this.currentQuestIndex = (this.currentQuestIndex + 1) % this.quests.length;
+        this.drawTargetWave();
+        document.getElementById('questDescription').textContent = this.getCurrentQuest().description;
+    }
+
+    drawTargetWave() {
+        const quest = this.getCurrentQuest();
+        const canvas = this.targetWaveCanvas;
+        const ctx = this.targetWaveCtx;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw center line
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+        
+        // Draw target wave
+        const wavelength = (quest.targetWavelength / 100) * 40;
+        const amplitude = (quest.targetAmplitude / 100) * (canvas.height / 3);
+        const centerY = canvas.height / 2;
+        
+        ctx.strokeStyle = quest.color.replace('0.4', '0.8');
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        
+        for (let x = 0; x < canvas.width; x += 2) {
+            const phase = (2 * Math.PI * x / wavelength);
+            const y = centerY + amplitude * Math.sin(phase);
+            if (x === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.stroke();
+    }
+
+    calculateAccuracy() {
+        const quest = this.getCurrentQuest();
+        const sim = this.simulator;
+        
+        // Calculate differences (normalized to 0-100 scale)
+        const freqDiff = Math.abs(sim.waveData.frequency - quest.targetFrequency) / 100;
+        const ampDiff = Math.abs(sim.waveData.amplitude - quest.targetAmplitude) / 100;
+        const wavelengthDiff = Math.abs(sim.waveData.wavelength - quest.targetWavelength) / 200;
+        
+        // Average the differences
+        const avgDiff = (freqDiff + ampDiff + wavelengthDiff) / 3;
+        
+        // Convert to accuracy percentage (0-100%)
+        const accuracy = Math.max(0, 100 - (avgDiff * 100));
+        
+        return Math.round(accuracy);
+    }
+
+    updateAccuracy() {
+        const accuracy = this.calculateAccuracy();
+        const fillElement = document.getElementById('accuracyFill');
+        const percentElement = document.getElementById('accuracyPercent');
+        
+        fillElement.style.width = accuracy + '%';
+        percentElement.textContent = accuracy + '%';
+        
+        // Change color based on accuracy
+        if (accuracy >= 90) {
+            fillElement.style.backgroundColor = '#2ecc71';
+        } else if (accuracy >= 70) {
+            fillElement.style.backgroundColor = '#f39c12';
+        } else if (accuracy >= 50) {
+            fillElement.style.backgroundColor = '#e74c3c';
+        } else {
+            fillElement.style.backgroundColor = '#95a5a6';
+        }
+    }
 }
 
 // Initialize simulator
 const canvas = document.getElementById('waveCanvas');
 const simulator = new WaveSimulator(canvas);
+const questSystem = new QuestSystem(simulator);
 
 // Control listeners
 document.getElementById('frequency').addEventListener('input', (e) => {
     simulator.setFrequency(e.target.value);
     document.getElementById('freqValue').textContent = e.target.value;
+    questSystem.updateAccuracy();
 });
 
 document.getElementById('amplitude').addEventListener('input', (e) => {
     simulator.setAmplitude(e.target.value);
     document.getElementById('ampValue').textContent = e.target.value;
+    questSystem.updateAccuracy();
 });
 
 document.getElementById('speed').addEventListener('input', (e) => {
@@ -266,6 +435,7 @@ document.getElementById('speed').addEventListener('input', (e) => {
 document.getElementById('wavelength').addEventListener('input', (e) => {
     simulator.setWavelength(e.target.value);
     document.getElementById('wavelengthValue').textContent = e.target.value;
+    questSystem.updateAccuracy();
 });
 
 // Material selection
@@ -301,5 +471,23 @@ document.getElementById('infoToggle').addEventListener('change', () => {
     simulator.toggleInfo();
 });
 
+document.getElementById('questToggle').addEventListener('change', () => {
+    simulator.toggleQuest();
+});
+
+// Quest controls
+document.getElementById('nextQuestBtn').addEventListener('click', () => {
+    questSystem.nextQuest();
+    questSystem.updateAccuracy();
+});
+
+// Update accuracy continuously
+setInterval(() => {
+    if (simulator.settings.showQuest) {
+        questSystem.updateAccuracy();
+    }
+}, 100);
+
 // Initialize info display
 simulator.updateInfo();
+questSystem.updateAccuracy();
