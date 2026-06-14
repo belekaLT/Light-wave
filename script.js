@@ -38,7 +38,7 @@ class WaveSimulator {
 
     createParticles() {
         this.particles = [];
-        const spacing = 10; // Smaller spacing for smoother curves
+        const spacing = 10;
         const centerY = this.canvas.height / 2;
         
         for (let x = 0; x < this.canvas.width; x += spacing) {
@@ -55,15 +55,13 @@ class WaveSimulator {
 
     calculateWaveDisplacement(x, t) {
         const wavelength = this.waveData.wavelength;
-        const amplitude = (this.waveData.amplitude / 100) * 30; // Scale to pixels
-        const frequency = this.waveData.frequency / 50; // Normalized frequency
-        const waveSpeed = (this.waveData.speed / 50) * 2; // Normalized speed
+        const amplitude = (this.waveData.amplitude / 100) * 30;
+        const frequency = this.waveData.frequency / 50;
+        const waveSpeed = (this.waveData.speed / 50) * 2;
         const refractiveIndex = this.waveData.refractiveIndex;
         
-        // Adjust speed based on material (inverse of refractive index)
         const actualSpeed = waveSpeed / refractiveIndex;
         
-        // Wave equation: y = A * sin(2π(x/λ - ft))
         const phase = (2 * Math.PI * (x / wavelength - frequency * actualSpeed * t));
         const displacement = amplitude * Math.sin(phase);
         
@@ -71,7 +69,7 @@ class WaveSimulator {
     }
 
     updateParticles() {
-        const t = this.time / 1000; // Convert to seconds
+        const t = this.time / 1000;
         
         for (let i = 0; i < this.particles.length; i++) {
             const particle = this.particles[i];
@@ -83,15 +81,11 @@ class WaveSimulator {
     drawWave() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid
         if (this.settings.showGrid) {
             this.drawGrid();
         }
         
-        // Draw wave
         this.drawWaveLine();
-        
-        // Draw particles
         this.drawParticles();
     }
 
@@ -100,7 +94,6 @@ class WaveSimulator {
         this.ctx.lineWidth = 1;
         const gridSize = 50;
         
-        // Vertical lines
         for (let x = 0; x < this.canvas.width; x += gridSize) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, 0);
@@ -108,7 +101,6 @@ class WaveSimulator {
             this.ctx.stroke();
         }
         
-        // Horizontal lines
         for (let y = 0; y < this.canvas.height; y += gridSize) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, y);
@@ -116,7 +108,6 @@ class WaveSimulator {
             this.ctx.stroke();
         }
         
-        // Center line
         this.ctx.strokeStyle = '#999';
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
@@ -162,10 +153,7 @@ class WaveSimulator {
         const refractiveIndex = this.waveData.refractiveIndex;
         const speed = this.waveData.speed;
         
-        // Period = 1 / frequency
         const period = (1 / freq).toFixed(4);
-        
-        // Actual speed = base speed / refractive index
         const actualSpeed = (speed / refractiveIndex).toFixed(2);
         
         document.getElementById('infoFreq').textContent = freq + ' Hz';
@@ -183,7 +171,7 @@ class WaveSimulator {
     startAnimationLoop() {
         const animate = () => {
             if (this.isRunning && !this.isPaused) {
-                this.time += 16; // ~60fps
+                this.time += 16;
                 this.updateParticles();
             }
             
@@ -248,10 +236,6 @@ class WaveSimulator {
     toggleQuest() {
         this.settings.showQuest = !this.settings.showQuest;
         document.getElementById('questBox').style.display = this.settings.showQuest ? 'block' : 'none';
-    }
-
-    getWavePointsArray() {
-        return this.particles.map(p => ({x: p.x, y: p.y}));
     }
 }
 
@@ -339,7 +323,6 @@ class QuestSystem {
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Draw center line
         ctx.strokeStyle = '#ddd';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -347,7 +330,6 @@ class QuestSystem {
         ctx.lineTo(canvas.width, canvas.height / 2);
         ctx.stroke();
         
-        // Draw target wave
         const wavelength = (quest.targetWavelength / 100) * 40;
         const amplitude = (quest.targetAmplitude / 100) * (canvas.height / 3);
         const centerY = canvas.height / 2;
@@ -374,15 +356,11 @@ class QuestSystem {
         const quest = this.getCurrentQuest();
         const sim = this.simulator;
         
-        // Calculate differences (normalized to 0-100 scale)
         const freqDiff = Math.abs(sim.waveData.frequency - quest.targetFrequency) / 100;
         const ampDiff = Math.abs(sim.waveData.amplitude - quest.targetAmplitude) / 100;
         const wavelengthDiff = Math.abs(sim.waveData.wavelength - quest.targetWavelength) / 200;
         
-        // Average the differences
         const avgDiff = (freqDiff + ampDiff + wavelengthDiff) / 3;
-        
-        // Convert to accuracy percentage (0-100%)
         const accuracy = Math.max(0, 100 - (avgDiff * 100));
         
         return Math.round(accuracy);
@@ -396,7 +374,6 @@ class QuestSystem {
         fillElement.style.width = accuracy + '%';
         percentElement.textContent = accuracy + '%';
         
-        // Change color based on accuracy
         if (accuracy >= 90) {
             fillElement.style.backgroundColor = '#2ecc71';
         } else if (accuracy >= 70) {
@@ -409,7 +386,7 @@ class QuestSystem {
     }
 }
 
-// Initialize simulator
+// Initialize
 const canvas = document.getElementById('waveCanvas');
 const simulator = new WaveSimulator(canvas);
 const questSystem = new QuestSystem(simulator);
@@ -438,7 +415,6 @@ document.getElementById('wavelength').addEventListener('input', (e) => {
     questSystem.updateAccuracy();
 });
 
-// Material selection
 document.querySelectorAll('.material-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
         document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
@@ -449,7 +425,6 @@ document.querySelectorAll('.material-btn').forEach(btn => {
     });
 });
 
-// Button controls
 document.getElementById('startBtn').addEventListener('click', () => {
     simulator.start();
 });
@@ -462,7 +437,6 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     simulator.reset();
 });
 
-// Toggle switches
 document.getElementById('gridToggle').addEventListener('change', () => {
     simulator.toggleGrid();
 });
@@ -475,19 +449,16 @@ document.getElementById('questToggle').addEventListener('change', () => {
     simulator.toggleQuest();
 });
 
-// Quest controls
 document.getElementById('nextQuestBtn').addEventListener('click', () => {
     questSystem.nextQuest();
     questSystem.updateAccuracy();
 });
 
-// Update accuracy continuously
 setInterval(() => {
     if (simulator.settings.showQuest) {
         questSystem.updateAccuracy();
     }
 }, 100);
 
-// Initialize info display
 simulator.updateInfo();
 questSystem.updateAccuracy();
